@@ -98,17 +98,15 @@ function findAllPossibleSlices(r, c) {
 function findCoordinates(row, col) {
     
     let coordinates = [];
-    _r = row
-    maxC = col + MAX_CELLS
+    _r = row;
+    maxC = col + MAX_CELLS;
     
-    while (true) {
-        if (maxC < _r) break;
-        
-        coordinates.push({ r: _r, c: Math.min(maxC, NUM_COLS) })
-        _r++
-        maxC = parseInt(maxC / 2, 10)
+    while (maxC >= _r) {
+        coordinates.push({ r: _r, c: Math.min(maxC, NUM_COLS) });
+        _r++;
+        maxC = parseInt(maxC / 2, 10);
     }
     
-    console.log(coordinates)
+    console.log(coordinates);
     return coordinates;
 }
