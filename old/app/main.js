@@ -45,7 +45,7 @@ rl.on('line', function(line, lineCount, byteCount) {
     console.log("TOMATOS: " + NUM_TOMATOS);
     console.log("MUSHROOMS: " + NUM_MUSHRO0MS);
     
-    findCoordinates(0, 0);
+    chooseBestSlice(0, 0);
     
     return;
     
@@ -76,37 +76,43 @@ rl.on('line', function(line, lineCount, byteCount) {
     console.error(e)
 });
 
-function findAllPossibleSlices(r, c) {
+function chooseBestSlice(row, col) {
     
-    let slices = findCoordinates(r, c); // TODO
+    let slices = findPossibleSliceEndCoordinates(row, col);
     
-    coordinates.forEach(elem => {
-        for (let _r = r; _r < elem.r; _r++) {
-            for (let _c = c; i < elem.c; _c++) {
+    slices.forEach(elem => {
+        for (let _r = row; _r <= elem.r; _r++) {
+            for (let _c = col; _c <= elem.c; _c++) {
+                
+                // how many cells does the slice cover
+                elem.CNT = ((_r - row) + 1) * (_c - col);
+                
+                // how many tomatoes / mushrooms does the slice contain
                 if (PIZZA[_r][_c].type === 'T') {
-                    elem.t = elem.t === undefined ? 1 : elem.t + 1
+                    elem.TOM = elem.TOM === undefined ? 1 : elem.TOM + 1
                 } else {
-                    elem.m = elem.m === undefined ? 1 : elem.m + 1
+                    elem.MUS = elem.MUS === undefined ? 1 : elem.MUS + 1
                 }
             }
         }
-    })
+    });
     
+    console.log(`${JSON.stringify(slices)}`);
 }
 
 
-function findCoordinates(row, col) {
+function findPossibleSliceEndCoordinates(row, col) {
     
     let coordinates = [];
+    
     _r = row;
     maxC = col + MAX_CELLS;
-    
     while (maxC >= _r) {
         coordinates.push({ r: _r, c: Math.min(maxC, NUM_COLS) });
         _r++;
         maxC = parseInt(maxC / 2, 10);
     }
     
-    console.log(coordinates);
+    console.log(`Found coordinates for (${row},${col}): ${JSON.stringify(coordinates.map(coord => `${coord.r},${coord.c}`))}`);
     return coordinates;
 }
