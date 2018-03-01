@@ -1,7 +1,7 @@
 const fileService = require('./src/services/fileService');
 const rideService = require('./src/services/rideService');
 
-const FILE_NAME_WITHOUT_EXTENSION = 'a_example';
+const FILE_NAME_WITHOUT_EXTENSION = 'c_no_hurry';
 const fileLines = fileService.getFileLines(`./input/${FILE_NAME_WITHOUT_EXTENSION}.in`);
 
 // extract the first line
@@ -52,7 +52,7 @@ for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
         }
     }
 }
-
+fileService.writeOutputFile(ALL_VEHICLES, `./output/${FILE_NAME_WITHOUT_EXTENSION}.out`);
 console.log(ALL_VEHICLES);
 
 function findFreeVehicles() {

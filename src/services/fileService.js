@@ -30,18 +30,19 @@ const getFileLines = (filePath) => {
 
 /**
  *
- * @param {Array<Object>} finalSlices
+ * @param {Array<Object>} vehicles
  * @param {String} filePath
  */
-const writeOutputFile = (finalSlices, filePath) => {
+const writeOutputFile = (vehicles, filePath) => {
   if (!fs.existsSync(path.dirname(filePath))) {
     fs.mkdirSync(path.dirname(filePath));
   }
   const stream = fs.createWriteStream(filePath);
 
   stream.once('open', (fd) => {
-    stream.write(`${finalSlices.length}\n`);
-    finalSlices.forEach(slice => stream.write(`${slice.rowStartIndex} ${slice.columnStartIndex} ${slice.rowEndIndex} ${slice.columnEndIndex}\n`));
+    // stream.write(`${vehicles.length}\n`);
+
+      vehicles.forEach(vehicle => stream.write(`${vehicle.completedRideIds.length} ${vehicle.completedRideIds.join(' ')}\n`));
     stream.end();
   });
 };
