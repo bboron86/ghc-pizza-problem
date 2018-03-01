@@ -44,8 +44,8 @@ for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
     for (let vehicle of findFreeVehicles()) {
         console.log(`Next free vehicle: ${vehicle.id}`);
         let nextRide = findNextPossibleRide(tickIdx, NUM_TICKS, vehicle.row, vehicle.col);
-        console.log(`Found next possible Ride: ${nextRide.id} with total cost: ${nextRide.totalCost}`);
         if (nextRide) {
+            console.log(`Found next possible Ride: ${nextRide.id} with total cost: ${nextRide.totalCost}`);
             vehicle.rideId = nextRide.id;
             vehicle.distanceToEnd = nextRide.totalCost;
             ALL_RIDES[nextRide.id].vid = vehicle.id;
@@ -70,7 +70,7 @@ function findFinishedRides() {
 function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCol) {
     
     let cheapestRideId;
-    let cheapestRideCost = 0;
+    let cheapestRideCost;
     for (let r of rideService.getUnassignedRides(ALL_RIDES)) {
         let startDistance = rideService.determineDistancePerRide(vehicleRow, vehicleCol, r.rowStart, r.columnStart);
         let startCost = r.startTime >= currentTick ? r.startTime - currentTick : 0;
@@ -87,7 +87,7 @@ function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCo
         }
     }
     
-    if (cheapestRideCost <= remainingTicks) {
+    if (cheapestRideCost && cheapestRideCost <= remainingTicks) {
         return { id: cheapestRideId, totalCost: cheapestRideCost };
     }
 }
