@@ -1,7 +1,7 @@
 const fileService = require('./src/services/fileService');
 const rideService = require('./src/services/rideService');
 
-const FILE_NAME_WITHOUT_EXTENSION = 'c_no_hurry';
+const FILE_NAME_WITHOUT_EXTENSION = 'b_should_be_easy';
 const fileLines = fileService.getFileLines(`./input/${FILE_NAME_WITHOUT_EXTENSION}.in`);
 
 // extract the first line
@@ -24,7 +24,7 @@ for (let v = 0; v < NUM_VEHICLES; v++) {
 
 
 for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
-    console.log(tickIdx);
+    // console.log(tickIdx);
     
     for (let vehicle of findAssignedVehicles()) {
         moveOrWaitVehicle(vehicle, tickIdx);
@@ -42,10 +42,10 @@ for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
     }
     
     for (let vehicle of findFreeVehicles()) {
-        console.log(`Next free vehicle: ${vehicle.id}`);
+        // console.log(`Next free vehicle: ${vehicle.id}`);
         let nextRide = findNextPossibleRide(tickIdx, NUM_TICKS, vehicle.row, vehicle.col);
         if (nextRide) {
-            console.log(`Found next possible Ride: ${nextRide.id} with total cost: ${nextRide.totalCost}`);
+            // console.log(`Found next possible Ride: ${nextRide.id} with total cost: ${nextRide.totalCost}`);
             vehicle.rideId = nextRide.id;
             vehicle.distanceToEnd = nextRide.totalCost;
             ALL_RIDES[nextRide.id].vid = vehicle.id;
@@ -53,7 +53,7 @@ for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
     }
 }
 fileService.writeOutputFile(ALL_VEHICLES, `./output/${FILE_NAME_WITHOUT_EXTENSION}.out`);
-console.log(ALL_VEHICLES);
+// console.log(ALL_VEHICLES.map(v => v.completedRideIds));
 
 function findFreeVehicles() {
     return ALL_VEHICLES.filter(v => v.rideId === null);
@@ -74,12 +74,13 @@ function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCo
     for (let r of rideService.getUnassignedRides(ALL_RIDES)) {
         let startDistance = rideService.determineDistancePerRide(vehicleRow, vehicleCol, r.rowStart, r.columnStart);
         let startCost = r.startTime >= currentTick ? r.startTime - currentTick : 0;
-        let totalCost = r.distance + startDistance + startCost;
+        let bonus = startCost >= startDistance ? parseInt(BONUS, 10) : 0;
+        let totalCost = r.distance + startDistance + startCost + bonus;
         
         if (rideId === undefined
-            || (totalCost > rideCost && totalCost <= remainingTicks)) {
+            || (totalCost > rideCost && (totalCost - bonus) <= remainingTicks)) {
             rideId = r.id;
-            rideCost = totalCost;
+            rideCost = totalCost - bonus;
         }
     }
     
