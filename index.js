@@ -78,7 +78,7 @@ function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCo
         let totalCost = r.distance + startDistance + startCost + bonus;
         
         if (rideId === undefined
-            || (totalCost > rideCost && (totalCost - bonus) <= remainingTicks)) {
+            || (totalCost < rideCost && (totalCost - bonus) <= remainingTicks)) {
             rideId = r.id;
             rideCost = totalCost - bonus;
         }
