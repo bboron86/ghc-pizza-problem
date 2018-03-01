@@ -21,10 +21,11 @@ const determineDistancePerRide = (rowStart, columnStart, rowFinish, columnFinish
 const getAllRides = (fileLines) => {
   const rides = [];
 
-  fileLines.forEach((line) => {
+  fileLines.forEach((line, index) => {
     const lineSplitted = line.split(' ');
 
     rides.push({
+      id: index,
       rowStart: lineSplitted[0],
       columnStart: lineSplitted[1],
       rowFinish: lineSplitted[2],
