@@ -1,25 +1,13 @@
 const fileService = require('./src/services/fileService');
+const rideService = require('./src/services/rideService');
 
+const FILE_NAME_WITHOUT_EXTENSION = 'a_example';
+const fileLines = fileService.getFileLines(`./input/${FILE_NAME_WITHOUT_EXTENSION}.in`);
 
+// extract the first line
+const [NUM_ROWS, NUM_COLS, NUM_VEHICLES, NUM_RIDES, BONUS, NUM_TICKS] = fileLines.shift().split(' ');
+const rides = rideService.getAllRides(fileLines);
 // DIST_MAP = determineDistancePerRide() -> 1->4; 2->2; 3->2
-
-let NUM_ROWS = 3;
-let NUM_COLS = 4;
-let NUM_VEHICLES = 2;
-let NUM_RIDES = 3;
-let NUM_TICKS = 10;
-
-let rides = [{
-    rowStart: 0,
-    columnStart: 0,
-    rowFinish: 1,
-    columnFinish: 3,
-    startTime: 2,
-    finishTime: 9,
-    complete: false,
-    vid: null
-}];
-
 
 // forEachTick (1...10)
 
@@ -32,6 +20,4 @@ let rides = [{
 //   forEachAssignedVehicle() -> move() // xy updaten oder an der stelle bleiben
 
 //   forEachFinishedRide(r -> r.isCompleted())  // deassing vehicle
-
-
 
