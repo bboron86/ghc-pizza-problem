@@ -69,26 +69,22 @@ function findFinishedRides() {
 
 function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCol) {
     
-    let cheapestRideId;
-    let cheapestRideCost;
+    let rideId;
+    let rideCost;
     for (let r of rideService.getUnassignedRides(ALL_RIDES)) {
         let startDistance = rideService.determineDistancePerRide(vehicleRow, vehicleCol, r.rowStart, r.columnStart);
         let startCost = r.startTime >= currentTick ? r.startTime - currentTick : 0;
         let totalCost = r.distance + startDistance + startCost;
         
-        if (cheapestRideId === undefined) {
-            cheapestRideId = r.id;
-            cheapestRideCost = totalCost;
-            
-        } else if (totalCost < cheapestRideCost) {
-            
-            cheapestRideId = r.id;
-            cheapestRideCost = totalCost;
+        if (rideId === undefined
+            || (totalCost > rideCost && totalCost <= remainingTicks)) {
+            rideId = r.id;
+            rideCost = totalCost;
         }
     }
     
-    if (cheapestRideCost && cheapestRideCost <= remainingTicks) {
-        return { id: cheapestRideId, totalCost: cheapestRideCost };
+    if (rideCost) {
+        return { id: rideId, totalCost: rideCost };
     }
 }
 
