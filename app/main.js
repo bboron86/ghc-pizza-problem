@@ -56,15 +56,21 @@ rl.on('line', function(line, lineCount, byteCount) {
     
             // console.log(`Looking for new slice starting at (${r},${c})`);
             let bestSlice = chooseBestSlice(r, c);
-            for (let _r = r; _r <= bestSlice.r; _r++) {
-                for (let _c = c; _c <= bestSlice.c; _c++) {
-                    PIZZA[_r][_c].sliced = true;
+            
+            if (bestSlice.TOM
+                && bestSlice.MUS
+                && bestSlice.TOM >= MIN_INGREDIENTS
+                && bestSlice.MUS >= MIN_INGREDIENTS
+                && bestSlice.SLI === undefined
+                && bestSlice.CNT <= MAX_CELLS
+                && bestSlice.CNT > 1
+            ) {
+                for (let _r = r; _r <= bestSlice.r; _r++) {
+                    for (let _c = c; _c <= bestSlice.c; _c++) {
+                        PIZZA[_r][_c].sliced = true;
+                    }
                 }
-            }
-            if (bestSlice.TOM && bestSlice.MUS) {
-                if (!(r === bestSlice.r && c === bestSlice.c)) {
-                    console.log(`${r} ${c} ${bestSlice.r} ${bestSlice.c}`);
-                }
+                console.log(`${r} ${c} ${bestSlice.r} ${bestSlice.c}`);
             }
             
         }
@@ -98,40 +104,38 @@ function chooseBestSlice(row, col) {
     });
     
     slices.sort(function(s1, s2) {
-        if (s1.MUS < MIN_INGREDIENTS && s2.MUS >= MIN_INGREDIENTS) return 1;
-        if (s2.MUS < MIN_INGREDIENTS && s1.MUS >= MIN_INGREDIENTS) return -1;
-    
-        if (s1.TOM < MIN_INGREDIENTS && s2.TOM >= MIN_INGREDIENTS) return 1;
-        if (s2.TOM < MIN_INGREDIENTS && s1.TOM >= MIN_INGREDIENTS) return -1;
+        let score1 = 0;
+        let score2 = 0;
         
-        if (s1.MUS < 1 && s2.MUS >= 1) return 1;
-        if (s2.MUS < 1 && s1.MUS >= 1) return -1;
-    
-        if (s1.TOM < 1 && s2.TOM >= 1) return 1;
-        if (s2.TOM < 1 && s1.TOM >= 1) return -1;
+        if (s1.SLI === undefined) score1++;
+        if (s1.CNT <= MAX_CELLS) score1++;
+        if (s1.CNT > 1) score1++;
+        if (s1.MUS !== undefined) score1++;
+        if (s1.TOM !== undefined) score1++;
+        if (s1.MUS >= MIN_INGREDIENTS) score1++;
+        if (s1.TOM >= MIN_INGREDIENTS) score1++;
         
-        if (s1.CNT > MAX_CELLS && s2.CNT <= MAX_CELLS) return 1;
-        if (s2.CNT > MAX_CELLS && s1.CNT <= MAX_CELLS) return -1;
+        if (s2.SLI === undefined) score2++;
+        if (s2.CNT <= MAX_CELLS) score2++;
+        if (s2.CNT > 1) score2++;
+        if (s2.MUS !== undefined) score2++;
+        if (s2.TOM !== undefined) score2++;
+        if (s2.MUS >= MIN_INGREDIENTS) score2++;
+        if (s2.TOM >= MIN_INGREDIENTS) score2++;
         
-        if (s1.MUS === undefined && s2.MUS !== undefined ) return 1;
-        if (s2.MUS === undefined && s1.MUS !== undefined ) return -1;
         
-        if (s1.SLI !== undefined && s2.SLI === undefined) return 1;
-        if (s2.SLI !== undefined && s1.SLI === undefined) return -1;
-        
-        if (s1.CNT <= 1 && s2.CNT > 1) return 1;
-        if (s2.CNT <= 1 && s1.CNT > 1) return -1;
-        
-        if (s1.MUS < s2.MUS) {
-            return -1;
-        } else if (s2.MUS < s1.MUS) {
-            return 1;
-        } else { // same number of mushrooms
-            if (s1.CNT > s2.CNT) return -1;
-            else if (s2.CNT > s1.CNT) return 1;
-            
-            return 0;   // doesn't matter
+        if (NUM_MUSHRO0MS < NUM_TOMATOS) {
+            if (s1.MUS && s2.MUS && s1.MUS >= MIN_INGREDIENTS && s2.MUS >= MIN_INGREDIENTS && s1.MUS < s2.MUS) score1 += 1;
+            if (s1.MUS && s2.MUS && s1.MUS >= MIN_INGREDIENTS && s2.MUS >= MIN_INGREDIENTS && s2.MUS < s1.MUS) score2 += 1;
+        } else {
+            if (s1.TOM && s2.TOM && s1.TOM >= MIN_INGREDIENTS && s2.TOM >= MIN_INGREDIENTS && s1.TOM < s2.TOM) score1 += 1;
+            if (s1.TOM && s2.TOM && s1.TOM >= MIN_INGREDIENTS && s2.TOM >= MIN_INGREDIENTS && s2.TOM < s1.TOM) score2 += 1;
         }
+        
+        if (s1.CNT > s2.CNT) score1++;
+        if (s2.CNT > s1.CNT) score2++;
+        
+        return score1 > score2 ? -1 : score2 > score1 ? 1 : 0;
     });
     
     let bestSlice = slices[0];
@@ -149,11 +153,15 @@ function findPossibleSliceEndCoordinates(row, col) {
     _r = row;
     let _c = MAX_CELLS - 1;
     while (_c >= 0 && _r < NUM_ROWS && (_r - row) < MAX_CELLS) {
-        coordinates.push({ r: _r, c: Math.min(NUM_COLS - 1, col + _c) });
+        for (let i = Math.min(NUM_COLS - 1, col + _c); i >= col; i--) {
+            coordinates.push({ r: _r, c: i });
+        }
         _r++;
         _c = parseInt(_c / 2, 10);
     }
-    coordinates.push({ r: Math.min(_r, NUM_ROWS - 1), c: col });
+    for (let j = Math.min(_r, NUM_ROWS - 1); j >= row; j--) {
+        coordinates.push({ r: j, c: col });
+    }
     
     // console.log(`Found coordinates for (${row},${col}): ${JSON.stringify(coordinates.map(coord => `${coord.r},${coord.c}`))}`);
     return coordinates;
