@@ -41,8 +41,9 @@ const getAllRides = (fileLines) => {
   return rides;
 };
 
+const getUnassignedRides = (allRides) => allRides.filter(r => r.vid === null);
 
 module.exports = {
-  getAllRides,
+  getAllRides, getUnassignedRides, determineDistancePerRide
 };
 

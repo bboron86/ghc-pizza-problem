@@ -28,10 +28,13 @@ for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
     }
     
     for (let vehicle of findFreeVehicles()) {
-    
-        let nextRide = findNextPossibleRide(NUM_TICKS - 1 - tickIdx, vehicle.row, vehicle.col);
-        vehicle.rideId = nextRide.id;
-        nextRide.vid = vehicle.id;
+        console.log(`Next free vehicle: ${vehicle.id}`);
+        let nextRideId = findNextPossibleRide(tickIdx, NUM_TICKS, vehicle.row, vehicle.col);
+        console.log(`Found next possible Ride: ${nextRideId}`);
+        if (nextRideId) {
+            vehicle.rideId = nextRideId;
+            ALL_RIDES[nextRideId].vid = vehicle.id;
+        }
     }
 }
 
@@ -47,8 +50,29 @@ function findFinishedRides() {
     return ALL_RIDES.filter(r => r.complete === true);
 }
 
-function findNextPossibleRide(remainingTicks, vehicleRow, vehicleCol) {
-    // todo
+function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCol) {
+    
+    let cheapestRideId;
+    let cheapestRideCost = 0;
+    for (let r of rideService.getUnassignedRides(ALL_RIDES)) {
+        let startDistance = rideService.determineDistancePerRide(vehicleRow, vehicleCol, r.rowStart, r.columnStart);
+        let startCost = r.startTime >= currentTick ? r.startTime - currentTick : 0;
+        let totalCost = r.distance + startDistance + startCost;
+        
+        if (cheapestRideId === undefined) {
+            cheapestRideId = r.id;
+            cheapestRideCost = totalCost;
+            
+        } else if (totalCost < cheapestRideCost) {
+            
+            cheapestRideId = r.id;
+            cheapestRideCost = totalCost;
+        }
+    }
+    
+    if (cheapestRideCost <= remainingTicks) {
+        return cheapestRideId;
+    }
 }
 
 function moveOrWaitVehicle(vehicle, tickIdx) {
