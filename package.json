@@ -16,5 +16,10 @@
   "bugs": {
     "url": "https://github.com/bboron86/ghc-pizza-problem/issues"
   },
-  "homepage": "https://github.com/bboron86/ghc-pizza-problem#readme"
+  "homepage": "https://github.com/bboron86/ghc-pizza-problem#readme",
+  "devDependencies": {
+    "eslint": "^4.18.1",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.9.0"
+  }
 }
