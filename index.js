@@ -1,7 +1,7 @@
 const fileService = require('./src/services/fileService');
 const rideService = require('./src/services/rideService');
 
-const FILE_NAME_WITHOUT_EXTENSION = 'b_should_be_easy';
+const FILE_NAME_WITHOUT_EXTENSION = 'e_high_bonus';
 const fileLines = fileService.getFileLines(`./input/${FILE_NAME_WITHOUT_EXTENSION}.in`);
 
 // extract the first line
@@ -10,7 +10,7 @@ const [NUM_ROWS, NUM_COLS, NUM_VEHICLES, NUM_RIDES, BONUS, NUM_TICKS] = fileLine
 const ALL_RIDES = rideService.getAllRides(fileLines);
 
 const ALL_VEHICLES = [];
-for (let v = 0; v < NUM_VEHICLES; v++) {
+for (let v = 0; v < parseInt(NUM_VEHICLES, 10); v++) {
     ALL_VEHICLES.push({
         id: v,
         row: 0,
@@ -23,27 +23,16 @@ for (let v = 0; v < NUM_VEHICLES; v++) {
 
 
 
-for (let tickIdx = 0; tickIdx < NUM_TICKS; tickIdx++) {
-    // console.log(tickIdx);
+for (let tickIdx = 0; tickIdx < parseInt(NUM_TICKS, 10); tickIdx++) {
+    console.log(tickIdx);
     
     for (let vehicle of findAssignedVehicles()) {
         moveOrWaitVehicle(vehicle, tickIdx);
     }
     
-    for (let finishedRide of findFinishedRides()) {
-        findAssignedVehicles()
-        .filter(v => v.rideId === finishedRide.id)
-        .forEach(v => {
-            v.completedRideIds.push(v.rideId);
-            v.row = ALL_RIDES[v.rideId].rowFinish;
-            v.col = ALL_RIDES[v.rideId].columnFinish;
-            v.rideId = null;
-        })
-    }
-    
     for (let vehicle of findFreeVehicles()) {
         // console.log(`Next free vehicle: ${vehicle.id}`);
-        let nextRide = findNextPossibleRide(tickIdx, NUM_TICKS, vehicle.row, vehicle.col);
+        let nextRide = findNextPossibleRide(tickIdx, parseInt(NUM_TICKS, 10), vehicle.row, vehicle.col);
         if (nextRide) {
             // console.log(`Found next possible Ride: ${nextRide.id} with total cost: ${nextRide.totalCost}`);
             vehicle.rideId = nextRide.id;
@@ -61,10 +50,6 @@ function findFreeVehicles() {
 
 function findAssignedVehicles() {
     return ALL_VEHICLES.filter(v => v.rideId !== null);
-}
-
-function findFinishedRides() {
-    return ALL_RIDES.filter(r => r.complete === true);
 }
 
 function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCol) {
@@ -90,9 +75,14 @@ function findNextPossibleRide(currentTick, remainingTicks, vehicleRow, vehicleCo
 }
 
 function moveOrWaitVehicle(vehicle, currentTick) {
-    let vRide = ALL_RIDES[vehicle.rideId];
     if (vehicle.distanceToEnd > 0) {
         vehicle.distanceToEnd -= 1;
-        if (vehicle.distanceToEnd === 0) vRide.complete = true;
+        if (vehicle.distanceToEnd === 0) {
+            ALL_RIDES[vehicle.rideId].complete = true;
+            vehicle.completedRideIds.push(vehicle.rideId);
+            vehicle.row = ALL_RIDES[vehicle.rideId].rowFinish;
+            vehicle.col = ALL_RIDES[vehicle.rideId].columnFinish;
+            vehicle.rideId = null;
+        }
     }
 }
